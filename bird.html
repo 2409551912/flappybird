@@ -1,0 +1,342 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <style>
+        #pass{
+          position: absolute;
+          right: 0px;
+          width: 100px;
+          height: 100px;
+          color:#fff;
+          font-weight: bolder;
+          z-index: 9999;
+        }
+        #myCanvas{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            background:rgba(0,0,0,0); 
+            z-index: 999;
+        }
+        #myCanvasBack{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            background: #4ec0ca;
+            z-index: -1;
+        }
+        #pop-up{
+        	position: absolute;
+			width:180px;
+			height: 60px;
+			left: 50%;
+			top: 50%;
+			margin-left: -90px;
+			margin-top: -60px;
+			background: rgba(10,128,234,0.8);
+			border-radius: 15px;
+			z-index: 99999;
+			text-align: center;
+			color:#ADE8FC;
+			font-size: 17px;
+			font-weight: bold;
+        }
+         #pop-up p{
+         	line-height: 10px;
+         }
+         #pop-up button{
+         	width:100px;
+         	border: none;
+         	background: rgba(10,128,234,0.8);
+         	color: #fff;
+         	padding:10px 0px;
+         }
+         #demo{
+         	width: 100%;
+         	max-width:420px;
+         	height: 100%;
+         	overflow: hidden;
+         	position: absolute;
+         	left: 50%;
+         	top: 0px;
+         }
+    </style>
+</head>
+<body>
+	<div id="demo">   
+    	<div id="pass">
+    		闯关数:<span id="pass_count">0</span>
+    	</div>
+    </div>
+
+<script type="text/javascript">
+	var demo = document.getElementById("demo");
+    var demoHeight = parseInt(document.documentElement.clientHeight), //窗口高度
+        windowWidth  = parseInt(document.documentElement.clientWidth),  //窗口宽度
+        demoWidth = parseInt(window.getComputedStyle(demo,"null").width), //窗口宽度
+        birdWidth = 40,             				//小鸟的宽度
+        birdHeigth = 40,            				//小鸟的高度
+        birdX = demoWidth/2 - birdWidth,  			//小鸟的初始横坐标
+        birdY = 250,                				//小鸟的初始纵坐标
+        backWidth = 80,             				//背景宽度
+        backX = demoWidth +300,        			//背景初始坐标
+        backSetTime,                				//背景定时
+        backStart = 1,              				//开始绘制背景
+        conduitDistance = 250,      				//水管间距离
+        secondBackX, 								//紧连背景坐标
+        randomBackground,           				//随机背景
+        sRandomBackground,          				//第二个随机背景
+        door = true,
+        num  = 0,                   				//闯关总数
+        state = "alive";
+        demo.style.marginLeft = -demoWidth/2+"px";
+        var pass_count = document.getElementById("pass_count");
+        
+
+<!---------------------------添加画布------------------------------>
+
+    var myCanvas = document.createElement("canvas");
+    myCanvas.width = demoWidth;
+    myCanvas.height = demoHeight;
+    myCanvas.setAttribute("id","myCanvas");
+    document.getElementById("demo").appendChild(myCanvas);
+
+    var myCanvasBack = document.createElement("canvas");
+    myCanvasBack.width = demoWidth;
+    myCanvasBack.height = demoHeight;
+    myCanvasBack.setAttribute("id","myCanvasBack");
+    document.getElementById("demo").appendChild(myCanvasBack);
+
+
+<!---------------------------绘制小鸟------------------------------>
+
+
+    var c=document.getElementById("myCanvas");
+    var cxt=c.getContext("2d");
+    var img=new Image();
+    img.onload=function(){
+        cxt.drawImage(img,birdX,birdY,birdWidth,birdHeigth);
+    }
+    img.src="images/bird.png";
+
+<!-------------------------绘制滚动背景---------------------------->
+
+    function drawBack(){
+        var cBack = document.getElementById("myCanvasBack");
+        var cxtBack = cBack.getContext("2d");
+        var backArray = ["back1.png","back2.png","back3.png","back4.png"];
+        var backImg = new Image();
+        var secondBackImg = new Image();
+        randomBackground = parseInt(Math.random()*4);
+        backImg.src = "images/"+backArray[randomBackground];
+
+/**
+ *绘制第一个背景 
+ */
+
+
+        function drawback1(){
+            cxtBack.clearRect(backX,0,backWidth,demoHeight);
+            backX = backX - 1;
+            cxtBack.drawImage(backImg,backX,0,backWidth,demoHeight);
+            backImg.onload = function(){
+                cxtBack.drawImage(backImg,backX,0,backWidth,demoHeight);  
+            }   
+
+            if(backX == parseInt(birdX)){
+            	secondBackX = backX + conduitDistance;
+                sRandomBackground = parseInt(Math.random()*4);
+                secondBackImg.src = "images/"+backArray[sRandomBackground];
+                secondBackImg.onload = function(){
+                	cxtBack.drawImage(secondBackImg,secondBackX,0,backWidth,demoHeight);  
+            	}
+
+            	}
+
+        }
+
+/**
+ * 绘制第二个背景
+ */
+        function drawback2(){
+        	if(secondBackX != undefined){
+	        	cxtBack.clearRect(secondBackX,0,backWidth,demoHeight);
+	 	        secondBackX = secondBackX - 1;
+	            cxtBack.drawImage(secondBackImg,secondBackX,0,backWidth,demoHeight);  
+            
+            if(secondBackX == parseInt(birdX)){
+            		randomBackground = parseInt(Math.random()*4);
+            		backImg.src = "images/"+backArray[randomBackground];
+            		backX = secondBackX + conduitDistance;
+            	}
+
+        	}
+        }
+
+		function count(){
+        	if(backX + backWidth == parseInt(birdX) || secondBackX + backWidth == parseInt(birdX) ){
+        		num++;
+        		pass_count.innerHTML = num;
+        	}
+        }
+        backSetTime = setInterval(function(){
+            drawback1();
+            drawback2();
+            count();
+        },8)
+
+        backStart = 0;
+    }
+    
+
+<!---------------------------定义危险区域-------------------------->
+    
+    function dangerZone(i){
+        var dangerTop,
+            dangerBottom;
+        if(backX<birdX+birdWidth && backX>birdX - backWidth){
+            dangerCoord(randomBackground)
+            if(birdY<dangerTop||birdY>dangerBottom){
+                bird.dead();
+            }
+
+        }
+
+        if(secondBackX<birdX+birdWidth  && secondBackX>birdX - backWidth){
+            dangerCoord(sRandomBackground)
+            if(birdY<dangerTop||birdY>dangerBottom){
+                bird.dead();
+            }
+        }
+
+        function dangerCoord(i){
+            switch(i){
+                case 0: dangerTop = demoHeight*48.89/100;
+                        dangerBottom = demoHeight*78.62/100 - birdHeigth;
+                break;
+                case 1: dangerTop = demoHeight*33.84/100;
+                        dangerBottom = demoHeight*62.61/100 - birdHeigth;
+                break;
+                case 2: dangerTop = demoHeight*14.60/100;
+                        dangerBottom = demoHeight*45.92/100 - birdHeigth;
+                break;
+                case 3: dangerTop = demoHeight*56.14/100;
+                        dangerBottom = demoHeight*84.42/100 - birdHeigth;
+                break;
+            }
+        } 
+
+
+
+
+    }
+    
+
+    
+
+
+<!---------------------------小鸟的抛体运-------------------------->
+
+ 
+    door = false;
+    var set_time; //小鸟飞行定时器 
+    var set_fall; 
+    var bird = {
+    	"v1" : 40,
+        "g"  : 10,
+        fly  :function(){
+            door   = true;
+            var v1 = this.v1;
+            var g  = this.g;
+            t1     = v1/g;   
+            var s;
+            var v2;
+            set_time = setInterval(function(){
+                if(t1>0){
+                    if(v2){
+                        v1 = v2;
+                        t1 = t1-1;
+                        v2 = v1-g;
+                         s = (v1*v1-v2*v2)/(2*g);
+                    }else{
+                        t1 = t1-1;
+                        v2 = v1-g;
+                        s  = (v1*v1-v2*v2)/(2*g);
+                    }
+                }else{
+                    t1 = 0;
+                    s  = 0;
+                    clearInterval(set_time);
+                    bird.fall(); 
+                }
+                cxt.clearRect(birdX, birdY, birdWidth, birdHeigth);
+                birdY = parseInt(birdY) - s; 
+                cxt.drawImage(img,birdX,birdY,birdWidth,birdHeigth);
+                dangerZone();
+            },150);
+        },
+        fall:function(){
+            door = true;
+            var v1 = 0;
+            var g = 4;
+            var t = v1/g;   
+            var s;
+            var v2;
+            set_fall = setInterval(function(){
+                v2  = v1+g;
+                s = v2*v2-v1*v1;
+                cxt.clearRect(birdX, birdY, birdWidth, birdHeigth);
+                birdY = parseInt(birdY) + s; 
+                cxt.drawImage(img,birdX,birdY,birdWidth, birdHeigth);
+                dangerZone();
+                if(birdY > demoHeight-35){
+                    clearInterval(set_fall); 
+                }
+            },150);
+        },
+        dead:function(){
+        	state = "dead";
+        	popUp();
+            var aa = clearInterval(set_fall);
+            var bb = clearInterval(set_time);
+            var cc = clearInterval(backSetTime);
+            bird.fall();
+        }
+    }
+    function popUp(){
+    	var box = document.createElement("div");
+    	box.innerHTML = "<p>您的极限仅仅"+num+"关吗</p><p>重新战斗吧</p><button id='btn' onclick='rStart()'>重新开始</button>";
+    	box.id = "pop-up";  //弄懂
+    	document.body.appendChild(box);
+    }
+    function rStart(){
+    	location.reload();  
+    }
+
+
+  <!-----------------------------单击事件------------------------------>
+
+    document.onclick = function(){
+    	if(state == "alive"){
+
+    		if(backStart == 1){
+            	drawBack();
+	        }           
+	        if(set_time){
+	        	clearInterval(set_time);
+	        }   
+	        if(set_fall){
+	        	clearInterval(set_fall);
+	        }     
+	        bird.fly();    
+
+        	back_door=false;
+
+    	}        
+    }
+
+</script>
+</body>
+</html>
