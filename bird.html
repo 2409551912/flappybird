@@ -73,23 +73,23 @@
 
 <script type="text/javascript">
 	var demo = document.getElementById("demo");
-    var demoHeight = parseInt(document.documentElement.clientHeight), //窗口高度
-        windowWidth  = parseInt(document.documentElement.clientWidth),  //窗口宽度
-        demoWidth = parseInt(window.getComputedStyle(demo,"null").width), //窗口宽度
-        birdWidth = 40,             				//小鸟的宽度
-        birdHeigth = 40,            				//小鸟的高度
-        birdX = demoWidth/2 - birdWidth,  			//小鸟的初始横坐标
-        birdY = 250,                				//小鸟的初始纵坐标
-        backWidth = 80,             				//背景宽度
-        backX = demoWidth +300,        			//背景初始坐标
-        backSetTime,                				//背景定时
-        backStart = 1,              				//开始绘制背景
-        conduitDistance = 250,      				//水管间距离
-        secondBackX, 								//紧连背景坐标
-        randomBackground,           				//随机背景
-        sRandomBackground,          				//第二个随机背景
+    var demoHeight = parseInt(document.documentElement.clientHeight),       //窗口高度
+        windowWidth  = parseInt(document.documentElement.clientWidth),      //窗口宽度
+        demoWidth = parseInt(window.getComputedStyle(demo,"null").width),   //窗口宽度
+        birdWidth = 40,             				                        //小鸟的宽度
+        birdHeigth = 40,            				                        //小鸟的高度
+        birdX = demoWidth/2 - birdWidth,  			                        //小鸟的初始横坐标
+        birdY = 250,                				                        //小鸟的初始纵坐标
+        backWidth = 80,             				                        //背景宽度
+        backX = demoWidth +300,        			                            //背景初始坐标
+        backSetTime,                				                        //背景定时
+        backStart = 1,              				                        //开始绘制背景
+        conduitDistance = 250,      				                        //水管间距离
+        secondBackX, 								                        //紧连背景坐标
+        randomBackground,           				                        //随机背景
+        sRandomBackground,          				                        //第二个随机背景
         door = true,
-        num  = 0,                   				//闯关总数
+        num  = 0,                   				                        //闯关总数
         state = "alive";
         demo.style.marginLeft = -demoWidth/2+"px";
         var pass_count = document.getElementById("pass_count");
